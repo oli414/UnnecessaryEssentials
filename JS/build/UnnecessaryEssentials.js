@@ -4,8 +4,103 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Core = undefined;
+
+var _UnesArray = require("./UnesArray");
+
+var Core = {
+    UnesArray: _UnesArray.UnesArray
+};
+
+exports.Core = Core;
+
+},{"./UnesArray":3}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.ExtendableBuiltin = ExtendableBuiltin;
+function ExtendableBuiltin(cls) {
+    function ExtendableBuiltin() {
+        cls.apply(this, arguments);
+    }
+    ExtendableBuiltin.prototype = Object.create(cls.prototype);
+    Object.setPrototypeOf(ExtendableBuiltin, cls);
+
+    return ExtendableBuiltin;
+}
+
+},{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.UnesArray = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ExtendableBuiltin2 = require("./ExtendableBuiltin");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var UnesArray = exports.UnesArray = function (_ExtendableBuiltin) {
+    _inherits(UnesArray, _ExtendableBuiltin);
+
+    function UnesArray() {
+        var _ref;
+
+        _classCallCheck(this, UnesArray);
+
+        for (var _len = arguments.length, items = Array(_len), _key = 0; _key < _len; _key++) {
+            items[_key] = arguments[_key];
+        }
+
+        return _possibleConstructorReturn(this, (_ref = UnesArray.__proto__ || Object.getPrototypeOf(UnesArray)).call.apply(_ref, [this].concat(items)));
+    }
+    // Removes an item from the array
+
+
+    _createClass(UnesArray, [{
+        key: "removeItem",
+        value: function removeItem(item) {
+            var i = this.indexOf(item);
+            if (i > -1) {
+                this.splice(i, 1);
+                return true;
+            }
+            return false;
+        }
+        // forEach with ability to break by returning true in the callback.
+
+    }, {
+        key: "iterate",
+        value: function iterate(body) {
+            for (var i = 0; i < this.length; i++) {
+                if (body(i, this[i])) break;
+            }
+        }
+    }]);
+
+    return UnesArray;
+}((0, _ExtendableBuiltin2.ExtendableBuiltin)(Array));
+
+},{"./ExtendableBuiltin":2}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Delegate = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _UnesArray = require("../Core/UnesArray");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -13,35 +108,32 @@ var Delegate = exports.Delegate = function () {
     function Delegate() {
         _classCallCheck(this, Delegate);
 
-        this.listeners = [];
+        this._listeners = new _UnesArray.UnesArray();
     }
 
     _createClass(Delegate, [{
         key: "bind",
         value: function bind(listener) {
-            this.listeners.push(listener);
+            this._listeners.push(listener);
         }
     }, {
         key: "unbind",
         value: function unbind(listener) {
-            var index = this.listeners.indexOf(listener);
-            if (index > -1) {
-                this.listeners.splice(index, 1);
-            }
+            return this._listeners.removeItem(listener);
         }
     }, {
         key: "fire",
         value: function fire() {
-            for (var i = 0; i < this.listeners.length; i++) {
-                this.listeners[i].fire.apply(this.listeners[i], arguments);
-            }
+            this._listeners.iterate(function (index, item) {
+                item.fire.apply(item, arguments);
+            });
         }
     }]);
 
     return Delegate;
 }();
 
-},{}],2:[function(require,module,exports){
+},{"../Core/UnesArray":3}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60,7 +152,7 @@ var Event = {
 
 exports.Event = Event;
 
-},{"./Delegate":1,"./Listener":3}],3:[function(require,module,exports){
+},{"./Delegate":4,"./Listener":6}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -91,7 +183,7 @@ var Listener = exports.Listener = function () {
     return Listener;
 }();
 
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -135,7 +227,7 @@ var Stopwatch = exports.Stopwatch = function (_Tickable) {
     return Stopwatch;
 }(_Tickable2.Tickable);
 
-},{"./Tickable":5}],5:[function(require,module,exports){
+},{"./Tickable":8}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -162,7 +254,7 @@ var Tickable = exports.Tickable = function () {
     return Tickable;
 }();
 
-},{"../Event/Event":2}],6:[function(require,module,exports){
+},{"../Event/Event":5}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -222,7 +314,7 @@ var Ticker = exports.Ticker = function () {
     return Ticker;
 }();
 
-},{"../Event/Event":2}],7:[function(require,module,exports){
+},{"../Event/Event":5}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -248,7 +340,7 @@ var Time = {
 exports.Time = Time;
 exports.Stopwatch = _Stopwatch.Stopwatch;
 
-},{"./Stopwatch":4,"./Tickable":5,"./Ticker":6,"./Timer":8}],8:[function(require,module,exports){
+},{"./Stopwatch":7,"./Tickable":8,"./Ticker":9,"./Timer":11}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -302,20 +394,23 @@ var Timer = exports.Timer = function (_Stopwatch) {
     return Timer;
 }(_Stopwatch2.Stopwatch);
 
-},{"../Event/Event":2,"./Stopwatch":4}],9:[function(require,module,exports){
+},{"../Event/Event":5,"./Stopwatch":7}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Event = exports.Time = undefined;
+exports.Core = exports.Event = exports.Time = undefined;
 
 var _Time = require("./Time/Time");
 
 var _Event = require("./Event/Event");
 
+var _Core = require("./Core/Core");
+
 exports.Time = _Time.Time;
 exports.Event = _Event.Event;
+exports.Core = _Core.Core;
 
-},{"./Event/Event":2,"./Time/Time":7}]},{},[9])(9)
+},{"./Core/Core":1,"./Event/Event":5,"./Time/Time":10}]},{},[12])(12)
 });

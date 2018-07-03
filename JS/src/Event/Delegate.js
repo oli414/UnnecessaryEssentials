@@ -1,20 +1,19 @@
 
+import { UnesArray } from "../Core/UnesArray";
+
 export class Delegate {
     constructor() {
-        this.listeners = [];
+        this._listeners = new UnesArray();
     }
     bind(listener) {
-        this.listeners.push(listener);
+        this._listeners.push(listener);
     }
     unbind(listener) {
-        var index = this.listeners.indexOf(listener);
-        if (index > -1) {
-            this.listeners.splice(index, 1);
-        }
+        return this._listeners.removeItem(listener);
     }
     fire() {
-        for (var i = 0; i < this.listeners.length; i++) {
-            this.listeners[i].fire.apply(this.listeners[i], arguments);
-        }
+        this._listeners.iterate(function(index, item) {
+            item.fire.apply(item, arguments);
+        });
     }
 }

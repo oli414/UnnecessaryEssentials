@@ -24,7 +24,7 @@ module.exports = function(grunt) {
                 tasks: ["copyfile"]
             },
             build: {
-                files: "src/*",
+                files: "src/**/*.js",
                 tasks: ["browserify"]
             }
         }
